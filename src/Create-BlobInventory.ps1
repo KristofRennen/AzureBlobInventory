@@ -37,13 +37,25 @@ $StorageAccountContext = New-AzStorageContext -StorageAccountName $StorageAccoun
 # Loop all matching objects for inventorization
 $MaxResults = 5000
 $TotalResults = 0
+$TotalSize = 0
 $ContinuationToken = $Null
 
 # Inventorize
 $InventoryFile = "$OutputPath\Account='$($StorageAccount)'__Container='$($Container)'__Prefix='$($Prefix)'.dat"
 
+Write-Host ""
+Write-Host "Inventory creation started at $(Get-Date)" -ForegroundColor Yellow
+Write-Host "`t > Storage Account: $($StorageAccount)" -ForegroundColor Yellow
+Write-Host "`t > Container: $($Container)" -ForegroundColor Yellow
+Write-Host "`t > Prefix: $($Prefix)" -ForegroundColor Yellow
+Write-Host ""
+
+$Stopwatch =  [system.diagnostics.stopwatch]::StartNew()
+
 Do 
 {
+    $TotalProgressedSecondsAtIterationStart = $Stopwatch.Elapsed.TotalSeconds
+
     $Blobs = Get-AzStorageBlob -Context $StorageAccountContext -Container $Container -Prefix $Prefix -MaxCount $MaxResults -ContinuationToken $ContinuationToken
         
     $TotalResults += $Blobs.Count
@@ -53,11 +65,31 @@ Do
     $ContinuationToken = $Blobs[$Blobs.Count - 1].ContinuationToken;
 
     $ItemBuilder = [System.Text.StringBuilder]::new()
-    $Blobs | ForEach-Object { [void]$ItemBuilder.AppendLine("$($_.Name)") } 
+    
+    $Blobs | ForEach-Object { 
+        
+        [void]$ItemBuilder.AppendLine("$($_.Name), $($_.Length)") 
+        $TotalSize += $_.Length
+    } 
+    
     Add-Content $InventoryFile $ItemBuilder.ToString()
+
+    $TotalProgressedSecondsAtIterationEnd = $Stopwatch.Elapsed.TotalSeconds
      
-    Write-Host "$(Get-Date -Format 'yyyy-MM-dd hh:mm:ss')   Inventorized $TotalResults objects so far, still working" -ForegroundColor Cyan
+    Write-Host "$(Get-Date -Format 'yyyy-MM-dd hh:mm:ss') `t Inventorized $TotalResults objects (Processing) `t`t [Elapsed $($Stopwatch.Elapsed), $([math]::Floor($Blobs.Count / ($TotalProgressedSecondsAtIterationEnd - $TotalProgressedSecondsAtIterationStart))) OPS]" -ForegroundColor Cyan
 }
 While ($ContinuationToken -ne $Null)
 
-Write-Host -Message "$(Get-Date -Format 'yyyy-MM-dd hh:mm:ss')   Inventorized $TotalResults objects matching $StorageAccount/$Container/$Prefix" -ForegroundColor Cyan
+$Stopwatch.Stop()
+
+Write-Host ""
+Write-Host "Inventory creation completed at $(Get-Date)" -ForegroundColor Yellow
+Write-Host "`t > Storage Account: $($StorageAccount)" -ForegroundColor Yellow
+Write-Host "`t > Container: $($Container)" -ForegroundColor Yellow
+Write-Host "`t > Prefix: $($Prefix)" -ForegroundColor Yellow
+Write-Host ""
+Write-Host "`t > Total objects processed: $($TotalResults)" -ForegroundColor Yellow
+Write-Host "`t > Total bytes: $($TotalSize)" -ForegroundColor Yellow
+Write-Host ""
+Write-Host "`t > Elapsed: $($Stopwatch.Elapsed)" -ForegroundColor Yellow
+Write-Host "`t > Requests per second: $([math]::Floor($TotalResults / $Stopwatch.Elapsed.TotalSeconds))" -ForegroundColor Yellow
