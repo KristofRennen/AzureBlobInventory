@@ -15,7 +15,7 @@ param
     [Parameter(Mandatory = $True, valueFromPipeline=$true)]
     [String] $Container,
     
-    [Parameter(Mandatory = $True, valueFromPipeline=$true)]
+    [Parameter(Mandatory = $False, valueFromPipeline=$true)]
     [String] $Prefix,
 
     [Parameter(Mandatory = $True, valueFromPipeline=$true)]
@@ -41,7 +41,15 @@ $TotalSize = 0
 $ContinuationToken = $Null
 
 # Inventorize
-$InventoryFile = "$OutputPath\Account='$($StorageAccount)'__Container='$($Container)'__Prefix='$($Prefix)'.dat"
+if ($Prefix -eq $null -or $Prefix -eq "") 
+{
+    $InventoryFile = "$OutputPath\Account='$($StorageAccount)'__Container='$($Container)'.dat"
+}
+else
+{
+    $InventoryFile = "$OutputPath\Account='$($StorageAccount)'__Container='$($Container)'__Prefix='$($Prefix)'.dat"
+}
+
 
 Write-Host ""
 Write-Host "Inventory creation started at $(Get-Date)" -ForegroundColor Yellow
@@ -56,7 +64,14 @@ Do
 {
     $TotalProgressedSecondsAtIterationStart = $Stopwatch.Elapsed.TotalSeconds
 
-    $Blobs = Get-AzStorageBlob -Context $StorageAccountContext -Container $Container -Prefix $Prefix -MaxCount $MaxResults -ContinuationToken $ContinuationToken
+    if ($Prefix -eq $null -or $Prefix -eq "") 
+    {
+        $Blobs = Get-AzStorageBlob -Context $StorageAccountContext -Container $Container -MaxCount $MaxResults -ContinuationToken $ContinuationToken
+    }
+    else
+    {
+        $Blobs = Get-AzStorageBlob -Context $StorageAccountContext -Container $Container -Prefix $Prefix -MaxCount $MaxResults -ContinuationToken $ContinuationToken
+    }
         
     $TotalResults += $Blobs.Count
 
