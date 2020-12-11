@@ -57,6 +57,8 @@ Write-Host "`t > Storage Account: $($StorageAccount)" -ForegroundColor Yellow
 Write-Host "`t > Container: $($Container)" -ForegroundColor Yellow
 Write-Host "`t > Prefix: $($Prefix)" -ForegroundColor Yellow
 Write-Host ""
+Write-Host "`t > Output: $($InventoryFile)" -ForegroundColor Yellow
+Write-Host ""
 
 $Stopwatch =  [system.diagnostics.stopwatch]::StartNew()
 
@@ -102,6 +104,8 @@ Write-Host "Inventory creation completed at $(Get-Date)" -ForegroundColor Yellow
 Write-Host "`t > Storage Account: $($StorageAccount)" -ForegroundColor Yellow
 Write-Host "`t > Container: $($Container)" -ForegroundColor Yellow
 Write-Host "`t > Prefix: $($Prefix)" -ForegroundColor Yellow
+Write-Host ""
+Write-Host "`t > Output: $($InventoryFile)" -ForegroundColor Yellow
 Write-Host ""
 Write-Host "`t > Total objects processed: $($TotalResults)" -ForegroundColor Yellow
 Write-Host "`t > Total bytes: $($TotalSize)" -ForegroundColor Yellow
