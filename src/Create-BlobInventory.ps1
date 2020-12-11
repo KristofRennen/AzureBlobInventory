@@ -9,6 +9,9 @@ param
     [Parameter(Mandatory = $True, valueFromPipeline=$true)]
     [String] $StorageAccount,
 
+    [Parameter(Mandatory = $False, valueFromPipeline=$true)]
+    [String] $StorageAccountKey,
+
     [Parameter(Mandatory = $True, valueFromPipeline=$true)]
     [String] $Container,
     
@@ -19,11 +22,16 @@ param
     [String] $OutputPath
 )
 
-# Connect to the Azure Subscritpion
-Connect-AzAccount -Subscription $SubscriptionId
+if ($StorageAccountKey -eq $Null -or $StorageAccountKey -eq "") 
+{
+    # Connect to the Azure Subscritpion
+    Connect-AzAccount -Subscription $SubscriptionId
 
-# Connect to the Storage Namespace
-$StorageAccountKey = ((Get-AzStorageAccountKey -ResourceGroupName $ResourceGroup -Name $StorageAccount) | Where-Object {$_.KeyName -eq "key1"}).Value
+    # Connect to the Storage Namespace
+    $StorageAccountKey = ((Get-AzStorageAccountKey -ResourceGroupName $ResourceGroup -Name $StorageAccount) | Where-Object {$_.KeyName -eq "key1"}).Value
+}
+
+# Create storage auth context
 $StorageAccountContext = New-AzStorageContext -StorageAccountName $StorageAccount -StorageAccountKey $StorageAccountKey
 
 # Loop all matching objects for inventorization

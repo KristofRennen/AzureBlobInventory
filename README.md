@@ -13,6 +13,7 @@ Through a full AAD based authentication, the user executing the script needs acc
 ## Create-BlobInventory.ps1
 
 The script has 5 mandatory parameters that can be used to create a segmented inventory of larger accounts.
+Using the storage account key parameter allows to overrule the AAD authentication.
 
 ```powershell
 param
@@ -25,6 +26,9 @@ param
 
     [Parameter(Mandatory = $True, valueFromPipeline=$true)]
     [String] $StorageAccount,
+
+    [Parameter(Mandatory = $False, valueFromPipeline=$true)]
+    [String] $StorageAccountKey,
 
     [Parameter(Mandatory = $True, valueFromPipeline=$true)]
     [String] $Container,
