@@ -85,7 +85,7 @@ Do
     
     $Blobs | ForEach-Object { 
         
-        [void]$ItemBuilder.AppendLine("$($_.Name), $($_.Length)") 
+        [void]$ItemBuilder.AppendLine("$($_.Name),$($_.Length)") 
         $TotalSize += $_.Length
     } 
     
