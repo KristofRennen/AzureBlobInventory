@@ -43,11 +43,11 @@ $ContinuationToken = $Null
 # Inventorize
 if ($Prefix -eq $null -or $Prefix -eq "") 
 {
-    $InventoryFile = "$OutputPath\Account='$($StorageAccount)'__Container='$($Container)'.dat"
+    $InventoryFile = "$OutputPath\$(get-date -Format "yyyyMMddHHmmss")___Account='$($StorageAccount)'__Container='$($Container)'.dat"
 }
 else
 {
-    $InventoryFile = "$OutputPath\Account='$($StorageAccount)'__Container='$($Container)'__Prefix='$($Prefix)'.dat"
+    $InventoryFile = "$OutputPath\$(get-date -Format "yyyyMMddHHmmss")___Account='$($StorageAccount)'__Container='$($Container)'__Prefix='$($Prefix)'.dat"
 }
 
 
