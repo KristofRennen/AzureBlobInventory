@@ -19,7 +19,7 @@ param
     [String] $Prefix,
 
     [Parameter(Mandatory = $True, valueFromPipeline=$true)]
-    [String] $OutputPath
+    [String] $OutputFile
 )
 
 if ($StorageAccountKey -eq $Null -or $StorageAccountKey -eq "") 
@@ -40,24 +40,13 @@ $TotalResults = 0
 $TotalSize = 0
 $ContinuationToken = $Null
 
-# Inventorize
-if ($Prefix -eq $null -or $Prefix -eq "") 
-{
-    $InventoryFile = "$OutputPath\$(get-date -Format "yyyyMMddHHmmss")___Account='$($StorageAccount)'__Container='$($Container)'.dat"
-}
-else
-{
-    $InventoryFile = "$OutputPath\$(get-date -Format "yyyyMMddHHmmss")___Account='$($StorageAccount)'__Container='$($Container)'__Prefix='$($Prefix)'.dat"
-}
-
-
 Write-Host ""
 Write-Host "Inventory creation started at $(Get-Date)" -ForegroundColor Yellow
 Write-Host "`t > Storage Account: $($StorageAccount)" -ForegroundColor Yellow
 Write-Host "`t > Container: $($Container)" -ForegroundColor Yellow
 Write-Host "`t > Prefix: $($Prefix)" -ForegroundColor Yellow
 Write-Host ""
-Write-Host "`t > Output: $($InventoryFile)" -ForegroundColor Yellow
+Write-Host "`t > Output: $($OutputFile)" -ForegroundColor Yellow
 Write-Host ""
 
 $Stopwatch =  [system.diagnostics.stopwatch]::StartNew()
@@ -89,7 +78,7 @@ Do
         $TotalSize += $_.Length
     } 
     
-    Add-Content $InventoryFile $ItemBuilder.ToString()
+    Add-Content $OutputFile $ItemBuilder.ToString()
 
     $TotalProgressedSecondsAtIterationEnd = $Stopwatch.Elapsed.TotalSeconds
      
@@ -105,7 +94,7 @@ Write-Host "`t > Storage Account: $($StorageAccount)" -ForegroundColor Yellow
 Write-Host "`t > Container: $($Container)" -ForegroundColor Yellow
 Write-Host "`t > Prefix: $($Prefix)" -ForegroundColor Yellow
 Write-Host ""
-Write-Host "`t > Output: $($InventoryFile)" -ForegroundColor Yellow
+Write-Host "`t > Output: $($OutputFile)" -ForegroundColor Yellow
 Write-Host ""
 Write-Host "`t > Total objects processed: $($TotalResults)" -ForegroundColor Yellow
 Write-Host "`t > Total bytes: $($TotalSize)" -ForegroundColor Yellow
