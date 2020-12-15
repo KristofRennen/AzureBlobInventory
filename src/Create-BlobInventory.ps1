@@ -78,7 +78,7 @@ Do
         $TotalSize += $_.Length
     } 
     
-    Add-Content $OutputFile $ItemBuilder.ToString()
+    Add-Content $OutputFile $ItemBuilder.ToString().Trim()
 
     $TotalProgressedSecondsAtIterationEnd = $Stopwatch.Elapsed.TotalSeconds
      
